@@ -15,7 +15,8 @@ void SmartTeam::print()
 
 // The smart team will first use the ninjas to attck the closest enemies, because
 // the cowboys can shoot from any distance, on top of that both ninjas and cowboys attack the closest enemy to them
-// without taking the enemy leader or team leader into consideartion
+// without taking the enemy leader or team leader into consideration, but cowboys will check if they
+// can kill anyone this turn.
 void SmartTeam::attack(Team * enemyTeam)
 {
      if(enemyTeam == nullptr)
@@ -54,7 +55,7 @@ void SmartTeam::attack(Team * enemyTeam)
     }
 
      // now ninjas attack
-    for (std::vector<Cowboy*>::size_type i = 0; i < teamSize; i++)
+    for (std::vector<Ninja*>::size_type i = 0; i < teamSize; i++)
     {
         Ninja* ninjaPtr;
         if (Ninja* ninjaPtr = dynamic_cast<Ninja*>(team[i]))
@@ -113,7 +114,29 @@ void SmartTeam::attack(Team * enemyTeam)
             {
                 continue;
             }
-            sacrifice = enemyTeam->closestMember(team[i+1]);
+
+            int minHealth = 11;
+            bool sacrificeSet = false;
+            for (std::vector<Character*>::size_type i = 0; i < 10; i++)
+            {
+                if(enemyTeam->team[i] == nullptr)
+                {
+                    break;
+                }
+
+                if(enemyTeam->team[i]->getHP() > 0 && enemyTeam->team[i]->getHP() < 11)
+                {
+                    sacrifice = enemyTeam->team[i];
+                    sacrificeSet = true;
+                }
+
+            }
+            
+            if(!sacrificeSet)
+            {
+                sacrifice = enemyTeam->closestMember(team[i+1]);
+            }
+            
             if(sacrifice == nullptr)
             {
                 printf("Enemy Team Defeated\n");
